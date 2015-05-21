@@ -1,5 +1,5 @@
 //
-//  BLCImagesTableViewController.h
+//  BLCDatasource.h
 //  Blocstagram
 //
 //  Created by Trevor Vieweg on 5/21/15.
@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface BLCImagesTableViewController : UITableViewController
+@interface BLCDatasource : NSObject
+
++(instancetype) sharedInstance;
+@property (nonatomic, strong, readonly) NSArray *mediaItems; 
 
 @end
