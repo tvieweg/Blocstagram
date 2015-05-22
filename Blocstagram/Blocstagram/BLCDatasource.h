@@ -11,6 +11,8 @@
 @interface BLCDatasource : NSObject
 
 +(instancetype) sharedInstance;
-@property (nonatomic, strong, readonly) NSArray *mediaItems; 
+- (void) deleteObjectAtIndex: (NSUInteger)index;
+
+@property (nonatomic, strong, readonly) NSArray *mediaItems;
 
 @end
