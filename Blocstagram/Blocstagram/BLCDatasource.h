@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+@class BLCMedia; 
+
 @interface BLCDatasource : NSObject
 
 +(instancetype) sharedInstance;
-- (void) deleteObjectAtIndex: (NSUInteger)index;
+- (void) deleteMediaItem: (BLCMedia *)item;
 
 @property (nonatomic, strong, readonly) NSArray *mediaItems;
 
