@@ -33,6 +33,10 @@
     //add observer for datasource key
     [[BLCDatasource sharedInstance] addObserver:self forKeyPath:@"mediaItems" options:0 context:nil];
     
+    //add pull to refresh
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(refreshControlDidFire:) forControlEvents:UIControlEventValueChanged];
+    
     [self.tableView registerClass:[BLCMediaTableViewCell class] forCellReuseIdentifier:@"mediaCell"];
 }
 
@@ -131,28 +135,28 @@
     [[BLCDatasource sharedInstance] removeObserver:self forKeyPath:@"mediaItems"];
 }
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+#pragma mark - Pull to Refresh
+- (void) refreshControlDidFire:(UIRefreshControl *) sender {
+    [[BLCDatasource sharedInstance] requestNewItemsWithCompletionHandler:^(NSError *error) {
+        [sender endRefreshing];
+    }]; 
 }
-*/
 
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
+- (void) infiniteScrollIfNecessary {
+    NSIndexPath *bottomIndexPath = [[self.tableView indexPathsForVisibleRows] lastObject];
+    
+    if (bottomIndexPath &&bottomIndexPath.row == [BLCDatasource sharedInstance].mediaItems.count - 1) {
+        [[BLCDatasource sharedInstance] requestOldItemsWithCompletionHandler:nil];
+    }
 }
-*/
 
-/*
-#pragma mark - Navigation
+#pragma mark - UIScrollViewDelegate
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+//used did end decelerating to keep function calls to a minimum. Works a little clunky in this example, but should be fine once we use real data.
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    [self infiniteScrollIfNecessary];
 }
-*/
+
+
 
 @end

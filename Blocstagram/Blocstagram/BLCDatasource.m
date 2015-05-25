@@ -17,6 +17,9 @@
 
 @property (nonatomic, strong) NSArray *mediaItems;
 
+@property (nonatomic, assign) BOOL isRefreshing;
+@property (nonatomic, assign) BOOL isLoadingOlderItems;
+
 @end
 
 @implementation BLCDatasource
@@ -143,6 +146,68 @@
 - (void) deleteMediaItem:(BLCMedia *)item {
     NSMutableArray *mutableArrayWithKVO = [self mutableArrayValueForKey:@"mediaItems"];
     [mutableArrayWithKVO removeObject:item];
+}
+
+#pragma mark - Completion Handlers
+- (void) requestNewItemsWithCompletionHandler:(BLCNewItemCompletionBlock)completionHandler {
+    if (self.isRefreshing == NO) {
+        self.isRefreshing = YES;
+        BLCMedia *media = [[BLCMedia alloc] init];
+        media.user = [self randomUser];
+        media.image = [UIImage imageNamed:@"10.jpg"];
+        //media.caption = [self randomSentenceWithMaximumNumberOfWords:7];
+        
+        NSUInteger commentCount = arc4random_uniform(10);
+        NSMutableArray *randomComments = [NSMutableArray array];
+        
+        for (int i = 0; i <= commentCount; i++) {
+            BLCComment *randomComment = [self randomComment];
+            [randomComments addObject:randomComment];
+        }
+        
+        media.comments = randomComments;
+        
+        NSMutableArray *mutableArrayWithKVO = [self mutableArrayValueForKey:@"mediaItems"];
+        [mutableArrayWithKVO insertObject:media atIndex:0];
+        
+        self.isRefreshing = NO;
+        
+        if (completionHandler) {
+            completionHandler(nil);
+        }
+    }
+}
+
+- (void) requestOldItemsWithCompletionHandler:(BLCNewItemCompletionBlock)completionHandler {
+    if (self.isLoadingOlderItems == NO) {
+        self.isLoadingOlderItems = YES;
+        BLCMedia *media = [[BLCMedia alloc] init];
+        media.user = [self randomUser];
+        media.image = [UIImage imageNamed:@"1.jpg"];
+        //media.caption = [self randomSentenceWithMaximumNumberOfWords:7];
+        
+        
+        NSUInteger commentCount = arc4random_uniform(10);
+        NSMutableArray *randomComments = [NSMutableArray array];
+        
+        for (int i = 0; i <= commentCount; i++) {
+            BLCComment *randomComment = [self randomComment];
+            [randomComments addObject:randomComment];
+        }
+        
+        media.comments = randomComments;
+        
+        NSMutableArray *mutableArrayWithKVO = [self mutableArrayValueForKey:@"mediaItems"];
+        [mutableArrayWithKVO addObject:media]; 
+        
+        self.isLoadingOlderItems = NO;
+        
+        if (completionHandler) {
+            completionHandler(nil);
+        }
+
+        
+    }
 }
 
 @end

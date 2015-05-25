@@ -8,12 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
-@class BLCMedia; 
+@class BLCMedia;
+
+typedef void (^BLCNewItemCompletionBlock)(NSError *error);
 
 @interface BLCDatasource : NSObject
 
 +(instancetype) sharedInstance;
+
 - (void) deleteMediaItem: (BLCMedia *)item;
+
+- (void) requestNewItemsWithCompletionHandler:(BLCNewItemCompletionBlock)completionHandler;
+- (void) requestOldItemsWithCompletionHandler:(BLCNewItemCompletionBlock) completionHandler; 
 
 @property (nonatomic, strong, readonly) NSArray *mediaItems;
 
