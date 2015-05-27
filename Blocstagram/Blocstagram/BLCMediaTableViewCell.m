@@ -150,6 +150,10 @@ static NSParagraphStyle *paragraphStyle;
         CGSize usernameLabelSize = [self.usernameAndCaptionLabel sizeThatFits:maxSize];
         CGSize commentLabelSize = [self.commentLabel sizeThatFits:maxSize];
         
+        if (self.mediaItem.image) {
+            self.imageHeightConstraint.constant = self.mediaItem.image.size.height / self.mediaItem.image.size.width * CGRectGetWidth(self.contentView.bounds);
+        }
+        
         self.usernameAndCaptionLabelHeightConstraint.constant = usernameLabelSize.height + 20;
         self.commentLabelHeightConstraint.constant = commentLabelSize.height + 20;
         
@@ -163,9 +167,7 @@ static NSParagraphStyle *paragraphStyle;
     self.mediaImageView.image = _mediaItem.image;
     self.usernameAndCaptionLabel.attributedText = [self usernameAndCaptionString];
     self.commentLabel.attributedText = [self commentString];
-    
-    self.imageHeightConstraint.constant = self.mediaItem.image.size.height / self.mediaItem.image.size.width * CGRectGetWidth(self.contentView.bounds);
-    
+        
 }
 
 + (CGFloat) heightForMediaItem:(BLCMedia *)mediaItem width:(CGFloat)width {
