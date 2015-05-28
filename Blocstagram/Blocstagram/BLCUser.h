@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface BLCUser : NSObject
+@interface BLCUser : NSObject <NSCoding>
 
 - (instancetype) initWithDictionary:(NSDictionary *)userDictionary;
 
