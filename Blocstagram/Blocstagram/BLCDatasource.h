@@ -26,6 +26,6 @@ typedef void (^BLCNewItemCompletionBlock)(NSError *error);
 
 @property (nonatomic, strong, readonly) NSArray *mediaItems;
 
-@property (nonatomic, strong, readonly) NSString *accessToken; 
+@property (nonatomic, strong, readonly) NSString *accessToken;
 
 @end
