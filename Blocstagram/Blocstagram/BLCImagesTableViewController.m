@@ -202,6 +202,11 @@
     }
 }
 
+- (void) didPressCellWithTwoFingers:(BLCMediaTableViewCell *)cell {
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    BLCMedia *item = [[BLCDatasource sharedInstance].mediaItems objectAtIndex:indexPath.row];
+    [[BLCDatasource sharedInstance] downloadImageForMediaItem: item];
+}
 
 #pragma mark - UIViewControllerTransitioningDelegate
 

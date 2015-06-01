@@ -16,6 +16,8 @@
 
 - (void) cell:(BLCMediaTableViewCell *)cell didLongPressImageView:(UIImageView *)imageView;
 
+- (void) didPressCellWithTwoFingers:(BLCMediaTableViewCell *)cell; 
+
 @end
 
 @interface BLCMediaTableViewCell : UITableViewCell
