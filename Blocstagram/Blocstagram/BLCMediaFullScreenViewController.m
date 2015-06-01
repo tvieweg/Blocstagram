@@ -7,6 +7,7 @@
 //
 
 #import "BLCMediaFullScreenViewController.h"
+#import "BLCImagesTableViewController.h"
 #import "BLCMedia.h"
 
 @interface BLCMediaFullScreenViewController () <UIScrollViewDelegate>
@@ -15,11 +16,14 @@
 
 @property (nonatomic, strong) UITapGestureRecognizer *tap;
 @property (nonatomic, strong) UITapGestureRecognizer *doubleTap;
-@property (nonatomic, strong) UIButton *shareButton;
+@property (nonatomic, weak) UIButton *shareButton;
 
 @end
 
 @implementation BLCMediaFullScreenViewController
+
+const int relativeHeightPaddingFactor = 30;
+const int relativeItemHeightFactor = 10;
 
 - (instancetype) initWithMedia:(BLCMedia *)media {
     self = [super init];
@@ -30,6 +34,7 @@
     
     return self;
 }
+
 
 - (void) viewDidLoad {
     [super viewDidLoad];
@@ -56,15 +61,28 @@
     [self.scrollView addGestureRecognizer:self.tap];
     [self.scrollView addGestureRecognizer:self.doubleTap];
     
-    //ADD SHARE BUTTON HERE
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
-    //[self.shareButton addTarget:self action:@selector(longPressDidFire:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:button];
-    self.shareButton = button;
+    self.shareButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [self.view addSubview:self.shareButton];
+    [self.shareButton setTitle: NSLocalizedString(@"Share", @"Share command") forState:UIControlStateNormal];
+    self.shareButton.backgroundColor = [UIColor whiteColor];
+    self.shareButton.alpha = 0.75;
+    
+    [self.shareButton addTarget:self action:@selector(shareButtonWasPressed) forControlEvents:UIControlEventTouchUpInside];
+    [[self navigationController] setNavigationBarHidden:NO animated:YES];
+
 }
 
 - (void) viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
+    
+    //set parameters for views based on iPhone 4 and 5 screen sizes.
+    CGFloat viewWidth = self.view.frame.size.width;
+    CGFloat padding = self.view.frame.size.height / relativeHeightPaddingFactor;
+    CGFloat itemHeight = self.view.frame.size.height / relativeItemHeightFactor;
+    
+    self.shareButton.frame = CGRectMake(0, padding, viewWidth, itemHeight);
+    
+    
     self.scrollView.frame = self.view.bounds;
     
     CGSize scrollViewFrameSize = self.scrollView.frame.size;
@@ -136,6 +154,23 @@
         [self.scrollView zoomToRect:CGRectMake(x, y, width, height) animated:YES];
     } else {
         [self.scrollView setZoomScale:self.scrollView.minimumZoomScale animated:YES];
+    }
+}
+
+- (void) shareButtonWasPressed {
+    NSMutableArray *itemsToShare = [NSMutableArray array];
+    
+    if (self.media.caption.length > 0) {
+        [itemsToShare addObject:self.media.caption];
+    }
+    
+    if (self.imageView.image) {
+        [itemsToShare addObject:self.imageView.image];
+    }
+    
+    if (itemsToShare.count > 0) {
+        UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:itemsToShare applicationActivities:nil];
+        [self presentViewController:activityVC animated:YES completion:nil];
     }
 }
 
