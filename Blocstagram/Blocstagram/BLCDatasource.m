@@ -237,21 +237,7 @@
     }
     
     if (tmpMediaItems.count > 0) {
-        //Write the changes to the disk
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSUInteger numberOfItemsToSave = MIN(self.mediaItems.count, 50);
-            NSArray *mediaItemsToSave = [self.mediaItems subarrayWithRange:NSMakeRange(0, numberOfItemsToSave)];
-            
-            NSString *fullPath = [self pathForFileName:NSStringFromSelector(@selector(mediaItems))];
-            NSData *mediaItemData = [NSKeyedArchiver archivedDataWithRootObject:mediaItemsToSave];
-            
-            NSError *dataError;
-            BOOL wroteSuccessfully = [mediaItemData writeToFile:fullPath options:NSDataWritingAtomic | NSDataWritingFileProtectionCompleteUnlessOpen error: &dataError];
-            
-            if (!wroteSuccessfully) {
-                NSLog(@"Couldn't write file: %@", dataError);
-            }
-        });
+        [self saveMediaToDisk:self.mediaItems];
     }
     
 }
@@ -294,6 +280,24 @@
     }
 }
 
+- (void) saveMediaToDisk:(NSArray *)mediaItems {
+    //Write the changes to the disk
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSUInteger numberOfItemsToSave = MIN(mediaItems.count, 50);
+        NSArray *mediaItemsToSave = [mediaItems subarrayWithRange:NSMakeRange(0, numberOfItemsToSave)];
+        
+        NSString *fullPath = [self pathForFileName:NSStringFromSelector(@selector(mediaItems))];
+        NSData *mediaItemData = [NSKeyedArchiver archivedDataWithRootObject:mediaItemsToSave];
+        
+        NSError *dataError;
+        BOOL wroteSuccessfully = [mediaItemData writeToFile:fullPath options:NSDataWritingAtomic | NSDataWritingFileProtectionCompleteUnlessOpen error: &dataError];
+        
+        if (!wroteSuccessfully) {
+            NSLog(@"Couldn't write file: %@", dataError);
+        }
+    });
+}
+
 #pragma mark - NSKeyedArchiver
 
 - (NSString *) pathForFileName:(NSString *) filename {
@@ -303,4 +307,45 @@
     return dataPath;
 }
 
+#pragma mark - Liking Media Items
+
+- (void) toggleLikeOnMediaItem:(BLCMedia *)mediaItem {
+    NSString *urlString = [NSString stringWithFormat:@"media/%@/likes", mediaItem.idNumber];
+    NSDictionary *parameters = @{@"access_token": self.accessToken};
+    
+    if (mediaItem.likeState == BLCLikeStateNotLiked) {
+        
+        mediaItem.likeState = BLCLikeStateLiking;
+        
+        [self.instagramOperationManager POST:urlString parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            mediaItem.likeState = BLCLikeStateLiked;
+            [self reloadMediaItem:mediaItem];
+            [self saveMediaToDisk:self.mediaItems];
+
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            mediaItem.likeState = BLCLikeStateNotLiked;
+            [self reloadMediaItem:mediaItem];
+        }];
+    } else if (mediaItem.likeState == BLCLikeStateLiked) {
+        
+        mediaItem.likeState = BLCLikeStateUnliking;
+        
+        [self.instagramOperationManager DELETE:urlString parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            mediaItem.likeState = BLCLikeStateNotLiked;
+            [self reloadMediaItem:mediaItem];
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            mediaItem.likeState = BLCLikeStateLiked;
+            [self reloadMediaItem:mediaItem];
+        }];
+        
+    }
+    
+    [self reloadMediaItem:mediaItem];
+}
+
+- (void) reloadMediaItem:(BLCMedia *)mediaItem {
+    NSMutableArray *mutableArrayWithKVO = [self mutableArrayValueForKey:@"mediaItems"];
+    NSUInteger index = [mutableArrayWithKVO indexOfObject:mediaItem];
+    [mutableArrayWithKVO replaceObjectAtIndex:index withObject:mediaItem];
+}
 @end

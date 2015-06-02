@@ -16,7 +16,8 @@
 
 - (void) cell:(BLCMediaTableViewCell *)cell didLongPressImageView:(UIImageView *)imageView;
 
-- (void) didPressCellWithTwoFingers:(BLCMediaTableViewCell *)cell; 
+- (void) didPressCellWithTwoFingers:(BLCMediaTableViewCell *)cell;
+- (void) cellDidPressLikeButton:(BLCMediaTableViewCell *)cell; 
 
 @end
 

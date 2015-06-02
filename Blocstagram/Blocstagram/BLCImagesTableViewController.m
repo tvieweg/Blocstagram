@@ -34,7 +34,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.viewIsDecelerating = YES;
     //add observer for datasource key
     [[BLCDatasource sharedInstance] addObserver:self forKeyPath:@"mediaItems" options:0 context:nil];
     
@@ -216,6 +215,12 @@
     BLCMedia *item = [[BLCDatasource sharedInstance].mediaItems objectAtIndex:indexPath.row];
     [[BLCDatasource sharedInstance] downloadImageForMediaItem: item];
 }
+
+#pragma mark - Liking
+- (void) cellDidPressLikeButton:(BLCMediaTableViewCell *)cell {
+    [[BLCDatasource sharedInstance] toggleLikeOnMediaItem:cell.mediaItem];
+}
+
 
 #pragma mark - UIViewControllerTransitioningDelegate
 
