@@ -1,0 +1,14 @@
+//
+//  Blocstagram-Prefix.pch
+//  Blocstagram
+//
+//  Created by Trevor Vieweg on 6/5/15.
+//  Copyright (c) 2015 Trevor Vieweg. All rights reserved.
+//
+
+#ifndef Blocstagram_Prefix_pch
+#define Blocstagram_Prefix_pch
+
+#define isPhone ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+
+#endif

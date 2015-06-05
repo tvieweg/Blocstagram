@@ -32,6 +32,8 @@
 
 @implementation BLCDatasource
 
+NSString *const BLCImageFinishedNotification = @"BLCImageFinishedNotification";
+
 + (instancetype) sharedInstance {
     static dispatch_once_t once;
     static id sharedInstance;
@@ -377,5 +379,9 @@
         NSLog(@"Response: %@", operation.responseString);
         [self reloadMediaItem:mediaItem];
     }];
+}
+
+- (void)documentInteractionController:(UIDocumentInteractionController *)controller didEndSendingToApplication:(NSString *)application {
+    [[NSNotificationCenter defaultCenter] postNotificationName:BLCImageFinishedNotification object:self];
 }
 @end

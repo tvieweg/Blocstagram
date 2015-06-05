@@ -16,6 +16,9 @@
 @property (nonatomic, strong) UITapGestureRecognizer *doubleTap;
 @property (nonatomic, weak) UIButton *shareButton;
 
+@property (nonatomic, strong) UITapGestureRecognizer *tapBehind;
+
+
 @end
 
 @implementation BLCMediaFullScreenViewController
@@ -40,6 +43,8 @@ const int relativeItemHeightFactor = 10;
     self.scrollView = [UIScrollView new];
     self.scrollView.delegate = self;
     self.scrollView.backgroundColor = [UIColor whiteColor];
+
+    
     
     [self.view addSubview:self.scrollView];
     
@@ -52,6 +57,12 @@ const int relativeItemHeightFactor = 10;
     self.tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapFired:)];
     
     self.doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapFired:)];
+    
+    if (isPhone == NO) {
+        self.tapBehind = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapBehindFired:)];
+        self.tapBehind.cancelsTouchesInView = NO;
+    }
+    
     self.doubleTap.numberOfTapsRequired = 2;
     
     [self.tap requireGestureRecognizerToFail:self.doubleTap];
@@ -139,6 +150,18 @@ const int relativeItemHeightFactor = 10;
     [super viewWillAppear:animated];
     
     [self centerScrollView];
+    
+    if (isPhone == NO) {
+        [[[[UIApplication sharedApplication] delegate] window] addGestureRecognizer:self.tapBehind];
+    }
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    if (isPhone == NO) {
+        [[[[UIApplication sharedApplication] delegate] window] removeGestureRecognizer:self.tapBehind];
+    }
 }
 
 #pragma mark - Gesture Recognizers
@@ -178,6 +201,21 @@ const int relativeItemHeightFactor = 10;
     if (itemsToShare.count > 0) {
         UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:itemsToShare applicationActivities:nil];
         [self presentViewController:activityVC animated:YES completion:nil];
+    }
+}
+
+- (void) tapBehindFired:(UITapGestureRecognizer *)sender {
+    if (sender.state == UIGestureRecognizerStateEnded) {
+        CGPoint location = [sender locationInView:nil]; // Passing nil gives us coordinates in the window
+        CGPoint locationInVC = [self.presentedViewController.view convertPoint:location fromView:self.view.window];
+        
+        if ([self.presentedViewController.view pointInside:locationInVC withEvent:nil] == NO) {
+            // The tap was outside the VC's view
+            
+            if (self.presentingViewController) {
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
+        }
     }
 }
 
