@@ -14,7 +14,6 @@
 
 - (instancetype) initWithDictionary:(NSDictionary *)mediaDictionary {
     self = [super init];
-    
     if (self) {
         self.idNumber = mediaDictionary[@"id"];
         self.user = [[BLCUser alloc] initWithDictionary:mediaDictionary[@"user"]];
