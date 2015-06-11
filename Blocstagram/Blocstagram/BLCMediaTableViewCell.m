@@ -63,7 +63,6 @@ static NSParagraphStyle *paragraphStyle;
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         //Initialization code
-        self.backgroundColor = commentLabelGray;
         self.mediaImageView = [[UIImageView alloc] init];
         self.mediaImageView.userInteractionEnabled = YES;
         
@@ -85,9 +84,7 @@ static NSParagraphStyle *paragraphStyle;
         self.usernameAndCaptionLabel.backgroundColor = usernameLabelGray;
 
         self.commentLabel = [[UILabel alloc] init];
-        self.commentLabel.numberOfLines = 0;
-        self.commentLabel.backgroundColor = commentLabelGray;
-        
+        self.commentLabel.numberOfLines = 0;        
         
         self.likeCount = [[BLCLikeCountLabel alloc] init];
         self.likeCount.backgroundColor = usernameLabelGray;
